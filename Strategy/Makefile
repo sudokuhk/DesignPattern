@@ -24,4 +24,4 @@ IStrategy.o : IStrategy.cpp
 	g++ -c IStrategy.cpp
 
 clean:
-	rm -rf *.o proxy
+	rm -rf *.o strategy
