@@ -1,22 +1,25 @@
 cxx=g++
-target = factory
-objects = Factory.o \
-	CBlackHuman.o CBlackHumanFactory.o \
-	CWhiteHuman.o CWhiteHumanFactory.o \
-	CYellowHuman.o CYellowHumanFactory.o
+TARGET = factory
+SOURCES = $(wildcard *.cpp)
+OBJECTS = $(patsubst %.cpp,%.o, $(SOURCES))
 
-$(target) : $(objects)
-	$(cxx) -o $(target) $(objects)
+all : $(TARGET)
 
-$(object) : %.o : %.cpp
-	$(cxx) -c $< -O $@
-
-%d : %.cpp
+%.d : %.cpp
 	@set -e; rm -f $@; \
-	$(cxx) -MM $(CPPFLAGS) $< > $@.;\
-	sed ’s,$*\.o[ :]*,1\.o $@ :,g’ < $@. > $@;
-#	rm -f $@.
+	$(cxx) -MM $< > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+ifneq ($(MAKECMDGOALS), clean)
+include $(SOURCES:.cpp=.d)
+endif
+
+$(TARGET) : $(OBJECTS)
+	$(cxx) -o $@ $(OBJECTS)
 
 .PHONY : clean
 clean:
-	-rm -rf *.o $(target)
+	-rm -f $(TARGET)
+	-rm -f *.o
+	-rm -f *.d
